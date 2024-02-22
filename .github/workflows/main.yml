@@ -41,7 +41,7 @@ jobs:
         uses: docker/build-push-action@v5.1.0
         with:
           push: true
-          tags: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.CONTAINER_NAME }}:${{ gitbub.sha }}
+          tags: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.CONTAINER_NAME }}:${{ github.sha }}
           file: ./Dockerfile
           
   deploy:
