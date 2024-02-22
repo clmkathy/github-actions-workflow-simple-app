@@ -34,7 +34,7 @@ jobs:
     # Container registry username
           username: ${{ env.AZURE_CONTAINER_REGISTRY_NAME }}
     # Container registry password
-          password: ${{ env.AZURE_CONTAINER_REGISTRY_PASSWORD }}
+          password: ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
     # Container registry server url
           login-server: ${{ env.AZURE_CONTAINER_REGISTRY }}
       - name: Build and push Docker images
@@ -59,4 +59,53 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup kubelogin
+        uses: Azure/use-kubelogin@v1.2
+          
+      - name: Azure Kubernetes set context
+        uses: Azure/aks-set-context@v3
+        with:
+    # Resource Group Name
+          resource-group: ${{ env.RESOURCE_GROUP }}
+    # AKS Cluster Name
+          cluster-name: ${{ env.CLUSTER_NAME }}
+    # Get cluster admin credentials. Values: true or false
+          admin: 'false'
+    # Enables kubelogin for non-admin user scenario. Values: true or false
+          use-kubelogin: 'true' # optional
+
+    # Substitute environment variables in a file
+      - name: envsubst-action
+  # You may pin to the exact commit or the version.
+  # uses: danielr1996/envsubst-action@704434f349d6cf73fe52e977d59375ba2fb97232
+        uses: danielr1996/envsubst-action@1.1.0
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          AZURE_CONTAINER_REGISTRY_NAME: ${{ env.AZURE_CONTAINER_REGISTRY_NAME }}
+          AZURE_CONTAINER_REGISTRY: ${{ env.AZURE_CONTAINEER_REGISTRY }}
+        with:
+    # File to run substitutions on
+          input: 
+            ${{ env.DEPLOYMENT_MANIFEST_PATH }}/hello-world-deployment.yaml
+    # File to write result to
+          output: 
+            hello-world-deployment.yaml
+
+      - name: Deploys application
+        uses: Azure/k8s-deplooy@v4
+        with:
+          action: deploy
+          manifests: |
+            hello-world-deployment.yaml
+            ${{ env.DEPLOYMENT_MANIFEST_PATH }}/hello-world-service.yaml
+          images: |
+            ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.CONTAINER_NAME }}:${{ github.sha }}
+          
         
