@@ -90,7 +90,7 @@ jobs:
         uses: danielr1996/envsubst-action@1.1.0
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          AZURE_CONTAINER_REGISTRY_NAME: ${{ env.AZURE_CONTAINER_REGISTRY_NAME }}
+          CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
           AZURE_CONTAINER_REGISTRY: ${{ env.AZURE_CONTAINEER_REGISTRY }}
         with:
     # File to run substitutions on
