@@ -91,7 +91,7 @@ jobs:
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
-          AZURE_CONTAINER_REGISTRY: ${{ env.AZURE_CONTAINEER_REGISTRY }}
+          AZURE_CONTAINER_REGISTRY: ${{ env.AZURE_CONTAINER_REGISTRY }}
         with:
     # File to run substitutions on
           input: 
